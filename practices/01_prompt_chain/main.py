@@ -77,12 +77,12 @@ def read_bruco_story():
         print(f"读取文件时出错：{e}")
         return None
 
-# 初始化语言模型（使用 Kimi 模型，从环境变量读取配置）
+# 初始化语言模型
 llm = ChatOpenAI(
     model=os.getenv("OPENAI_MODEL"),
     base_url=os.getenv("OPENAI_BASE_URL"),
     api_key=os.getenv("OPENAI_API_KEY"),
-    temperature=0,
+    temperature=0.25,
 )
 
 # --- Prompt 1: 总结市场故事  ---
