@@ -1,6 +1,6 @@
 # agentic-design-pattern-lab
 
-本项目 fork 自 https://github.com/ginobefun/agentic-design-patterns-cn，用于自我学习时记录自己的笔记，以及相应的代码调整。
+本项目 fork 自 [agentic-design-patterns-cn](https://github.com/ginobefun/agentic-design-patterns-cn)，用于自我学习时记录自己的笔记，以及相应的代码调整。
 
 ## Setup
 
@@ -12,7 +12,7 @@ uv venv venv
 source venv/bin/activate
 
 # 安装依赖
-uv pip install langchain langchain-community langchain-ollama langgraph
+uv pip install langchain langchain-community langchain-openai langchain-ollama langgraph
 ```
 
 ### 配置 ollama
