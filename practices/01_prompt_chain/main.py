@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
+from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
@@ -78,12 +79,15 @@ def read_bruco_story():
         return None
 
 # 初始化语言模型
-llm = ChatOpenAI(
-    model=os.getenv("OPENAI_MODEL"),
-    base_url=os.getenv("OPENAI_BASE_URL"),
-    api_key=os.getenv("OPENAI_API_KEY"),
-    temperature=0.25,
-)
+## uncomment to use local ollama
+llm = ChatOllama(model="qwen3:4b-instruct", temperature=0)
+## uncomment to use remote LLM API
+# llm = ChatOpenAI(
+#     model=os.getenv("OPENAI_MODEL"),
+#     base_url=os.getenv("OPENAI_BASE_URL"),
+#     api_key=os.getenv("OPENAI_API_KEY"),
+#     temperature=0.25,
+# )
 
 # --- Prompt 1: 总结市场故事  ---
 summarize_prompt = ChatPromptTemplate.from_template(
