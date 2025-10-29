@@ -1,36 +1,24 @@
 import os
 import asyncio
-from typing import Optional
 
-from langchain_openai import ChatOpenAI
+from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import Runnable, RunnableParallel, RunnablePassthrough
 
-# Colab 代码链接：https://colab.research.google.com/drive/1uK1r9p-5sdX0ffMjAi_dbIkaMedb1sTj
-
 # 安装依赖
 # pip install langchain langchain-community langchain-openai langgraph
 
-# For better security, load environment variables from a .env file
-# 为了更好的安全性，建议从 .env 文件加载环境变量
-from dotenv import load_dotenv
-load_dotenv()
 
-# --- Configuration ---
-# Ensure your API key environment variable is set (e.g., OPENAI_API_KEY)
-# 确保你的 API 密钥环境变量已设置 (如 OPENAI_API_KEY)
+# 使用本地 ollama
 try:
-    llm: Optional[ChatOpenAI] = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
-    if llm:
-        print(f"Language model initialized: {llm.model_name}")
+    llm: ChatOllama = ChatOllama(model="qwen3:4b-instruct", temperature=0.7)
+    print(f"Language model initialized: {llm.model}")
 except Exception as e:
     print(f"Error initializing language model: {e}")
-    llm = None
+    raise RuntimeError("Failed to initialize language model. Please ensure Ollama is running and the model is available.") from e
 
 
-# --- Define Independent Chains ---
-# These three chains represent distinct tasks that can be executed in parallel.
 # --- 定义独立的链 ---
 # 这三条链代表彼此独立、可同时执行的任务。
 summarize_chain: Runnable = (
@@ -61,22 +49,19 @@ terms_chain: Runnable = (
 )
 
 
-# --- Build the Parallel + Synthesis Chain ---
+# --- 构建并行化任务 ---
 
-# 1. Define the block of tasks to run in parallel. The results of these,
-#    along with the original topic, will be fed into the next step.
-# --- 定义要并行执行的任务块。这些结果以及原始内容将作为输入传递给下一步。
+# --- 1. 定义要并行执行的任务块。这些结果以及原始内容将作为输入传递给下一步。
 map_chain = RunnableParallel(
     {
         "summary": summarize_chain,
         "questions": questions_chain,
         "key_terms": terms_chain,
-        "topic": RunnablePassthrough(),  # Pass the original topic through
+        "topic": RunnablePassthrough(),  # 把原始请求传递下去
     }
 )
 
-# 2. Define the final synthesis prompt which will combine the parallel results.
-# --- 定义最终的综合提示，将并行结果合并。
+# --- 2. 定义最终的综合提示，将并行结果合并。
 synthesis_prompt = ChatPromptTemplate.from_messages([
     ("system", """Based on the following information:
      Summary: {summary}
@@ -86,13 +71,12 @@ synthesis_prompt = ChatPromptTemplate.from_messages([
     ("user", "Original topic: {topic}")
 ])
 
-# 3. Construct the full chain by piping the parallel results directly
-#    into the synthesis prompt, followed by the LLM and output parser.
-# --- 通过将并行结果直接传递给综合提示，然后是语言模型和输出解析器，构建完整的链。
-full_parallel_chain = map_chain | synthesis_prompt | llm | StrOutputParser()
+synthesis_chain = synthesis_prompt | llm | StrOutputParser()
+
+# --- 3. 通过将并行结果直接传递给综合提示，然后是语言模型和输出解析器，构建完整的链。
+full_parallel_chain = map_chain | synthesis_chain
 
 
-# --- Run the Chain ---
 # --- 运行链 ---
 async def run_parallel_example(topic: str) -> None:
     """
@@ -102,10 +86,6 @@ async def run_parallel_example(topic: str) -> None:
     Args:
         topic: The input topic to be processed by the LangChain chains.
     """
-    if not llm:
-        print("LLM not initialized. Cannot run example.")
-        return
-
     print(f"\n--- Running Parallel LangChain Example for Topic: '{topic}' ---")
     try:
         # The input to `ainvoke` is the single 'topic' string, which is
