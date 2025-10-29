@@ -77,7 +77,7 @@ coordinator_agent = Agent(
     backstory="You are a dispatcher that routes user intents to either booking or information specialist.",
     llm=local_llm,
     verbose=True,
-    allow_delegation=True,
+    allow_delegation=True, # 如果任务超出自己能力范围，允许主动委托给其他更合适的 Agent。
 )
 
 # --- 执行逻辑 ---
