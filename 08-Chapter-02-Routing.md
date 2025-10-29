@@ -432,7 +432,7 @@ if __name__ == "__main__":
     main()
 ```
 
-译者注：[Colab 代码](https://colab.research.google.com/drive/10wxRlPyDJ70pPEtWWA3Aa3tjvfobrB3m) 已维护在[此处](/codes/Chapter-02-Routing-ADK-Example.py)。
+译者注：[Colab 代码](https://colab.research.google.com/drive/10wxRlPyDJ70pPEtWWA3Aa3tjvfobrB3m) 已维护在[此处](/codes/Chapter-02-Routing-CrewAI-Example.py)。
 
 This script consists of a main Coordinator agent and two specialized sub_agents: Booker and Info. Each specialized agent is equipped with a FunctionTool that wraps a Python function simulating an action. The booking_handler function simulates handling flight and hotel bookings, while the info_handler function simulates retrieving general information. The unclear_handler is included as a fallback for requests the coordinator cannot delegate, although the current coordinator logic doesn't explicitly use it for delegation failure in the main run_coordinator function.
 
