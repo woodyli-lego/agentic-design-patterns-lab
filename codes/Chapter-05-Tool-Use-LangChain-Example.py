@@ -50,8 +50,6 @@ agent_prompt = ChatPromptTemplate.from_messages([
 # 使用定义好的大语言模型、工具和提示词模板构建智能体。
 agent = create_agent(model=llm, tools=tools, system_prompt="You are a helpful assistant")
 
-# Using agent directly; AgentExecutor no longer required with create_agent.
-
 async def run_agent_with_tool(query: str):
    """
    Invokes the agent executor with a query and prints the final response.
@@ -72,6 +70,8 @@ async def main():
    tasks = [
       run_agent_with_tool("What is the capital of France?"),
       run_agent_with_tool("What's the weather like in London?"),
+      # 不知道是怎么做到的，但是 tool 的文档应该明确说明支持 `population of earth` 关键字。
+      run_agent_with_tool("Tell me the population of Earth."),
       run_agent_with_tool("Tell me something about dogs.") # Should trigger the default tool response
    ]
    await asyncio.gather(*tasks)
